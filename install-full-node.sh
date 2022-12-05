@@ -141,11 +141,11 @@ Blockchain file folder:
 Command to stop Bitcoin Core:
 
     $HOME/bitcoin-core/bin/stop.sh
-    or 
+    or
     stop-btc
 
 Command to start Bitcoin Core again:
-   
+
     $HOME/bitcoin-core/bin/start.sh
     or
     start-btc
@@ -556,7 +556,7 @@ EOF
 $TARGET_DIR/bin/bitcoin-cli -conf=$TARGET_DIR/.bitcoin/bitcoin.conf getnetworkinfo
 EOF
 
-    chmod ugo+x $TARGET_DIR/bin/get-net-info.sh    
+    chmod ugo+x $TARGET_DIR/bin/get-net-info.sh
 }
 
 start_bitcoin_core() {
@@ -683,14 +683,22 @@ probe_external_usb() {
         fi
     else
         print_info "\nExternal USB drive found: $EXTERNAL_FOLDER"
-    fi    
+    fi
 }
 
 move_to_external() {
     if [ -d "$EXTERNAL_FOLDER/.bitcoin" ]
     then
-        rm -rf $HOME/bitcoin-core/.bitcoin
         print_info "\nBlockchain data found. Continuing from last block..."
+
+        if [ -f "$EXTERNAL_FOLDER/.bitcoin/bitcoin.conf" ]
+        then
+            cp $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf_bkp
+            mv $HOME/bitcoin-core/.bitcoin/bitcoin.conf $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf
+            print_info "\n\"bitcoin.conf\" file found. It has been overwritten and a backup copy has been saved on the external drive (\"bitcoin.conf_bkp\")."
+        fi
+
+        rm -rf $HOME/bitcoin-core/.bitcoin
     else
         mv $HOME/bitcoin-core/.bitcoin $EXTERNAL_FOLDER/
         rm $EXTERNAL_FOLDER/usb-hook
@@ -711,7 +719,7 @@ create_commands() {
 #!/bin/sh
 tail -f $EXTERNAL_FOLDER/.bitcoin/debug.log
 EOF
-        
+
     chmod ugo+x $HOME/bitcoin-core/bin/debug.sh
 
     cat > $HOME/bitcoin-core/bin/get-bc-info.sh <<EOF

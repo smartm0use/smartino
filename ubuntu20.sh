@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-pkg install wget -y 
+pkg install wget -y
 folder=ubuntu20-fs
 cur=`pwd`
 if [ -d "$folder" ]; then
@@ -21,13 +21,13 @@ if [ "$first" != 1 ];then
 		amd64)
 			archurl="amd64" ;;
 		x86_64)
-			archurl="amd64" ;;	
+			archurl="amd64" ;;
 		*)
 			echo "unknown architecture"; exit 1 ;;
 		esac
 		wget "https://github.com/AndronixApp/AndronixOrigin/raw/master/Rootfs/Ubuntu20/focal-${archurl}.tar.gz" -O $tarball
 	fi
-	
+
 	mkdir -p "$folder"
 	cd "$folder"
 	echo "Decompressing Rootfs, please be patient."
@@ -251,4 +251,4 @@ echo "removing image for some space"
 rm $tarball
 clear
 echo "You can now launch Ubuntu with the ./${bin} script form next time"
-sudo bash $bin
+bash $bin || pkg install tsu && sudo bash $bin
