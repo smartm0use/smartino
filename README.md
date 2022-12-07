@@ -40,3 +40,17 @@ pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/An
 ```
 apt-get update && apt-get upgrade -y && apt install curl -y && curl https://raw.githubusercontent.com/smartm0use/smartino/main/install-full-node.sh | sh
 ```
+
+Remote access using SSH
+-
+To have remote access to your phone you can follow [SSH Basics](https://docs.andronix.app/ssh/ssh-basics) by Andronix or follow these steps:
+* `apt-get update`
+* `apt install openssh-server nano`
+* `nano /etc/ssh/sshd_config` and make the following changes:
+    * Find and change the line `#Port 22` to `Port 2222`
+    * Find the line `#PermitRootLogin prohibit-password` or `#PermitRootLogin yes` and change it to `PermitRootLogin yes`
+    * Save and exit pressing CTRL+X and then type Y and then press Enter
+* `ssh-keygen -A` and `then ssh-keygen`
+* `/usr/sbin/sshd` to start the SSH server (if you get *Missing privilege seperation directory: /run/sshd* just create that directory with `mkdir /run/sshd` and run the command again)
+* `ip a` or `hostname -I` to know your local IP address
+* Now you are able to connect to the phone from another device with the following command: `ssh root@<PHONE_IP_ADDRESS> -p 2222`
