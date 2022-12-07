@@ -714,6 +714,7 @@ create_commands() {
 
     sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/start.sh
     sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/stop.sh
+    sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/get-net-info.sh
 
     cat > $HOME/bitcoin-core/bin/debug.sh <<EOF
 #!/bin/sh
