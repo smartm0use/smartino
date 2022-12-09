@@ -31,7 +31,7 @@ Installation
 -
 - Connect the external drive to the phone and be sure you can open it with a file explorer
 - Install the latest version of [Termux](https://f-droid.org/en/packages/com.termux)
-- Check if you can access the external drive within Termux, otherwise you have to root the phone
+- Check if you can access the external drive within Termux (command `termux-setup-storage` will configure access and setup symlink `~/storage/external-1`), otherwise you have to root the phone
 - Run the following command (it will basically install Ubuntu on your phone)
 ```
 pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/AndronixApp/AndronixOrigin/master/repo-fix.sh > repo.sh && chmod +x repo.sh && bash repo.sh && pkg update -y && pkg install wget curl proot tar -y && wget https://raw.githubusercontent.com/smartm0use/smartino/main/ubuntu20.sh -O ubuntu20.sh && chmod +x ubuntu20.sh && bash ubuntu20.sh
@@ -40,6 +40,8 @@ pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/An
 ```
 apt-get update && apt-get upgrade -y && apt install curl -y && curl https://raw.githubusercontent.com/smartm0use/smartino/main/install-full-node.sh | sh
 ```
+- Be sure you've configured your router for [port forwarding](https://bitcoin.org/en/full-node#port-forwarding) (port 8333) and optionally to change your [firewall settings](https://bitcoin.org/en/full-node#firewall-configuration)
+- Once your node is fully synced with the blockchain visit [Bitnodes](https://bitnodes.io/#join-the-network) to check connection
 
 Remote access using SSH
 -
@@ -50,7 +52,9 @@ To have remote access to your phone you can follow [SSH Basics](https://docs.and
     * Find and change the line `#Port 22` to `Port 2222`
     * Find the line `#PermitRootLogin prohibit-password` or `#PermitRootLogin yes` and change it to `PermitRootLogin yes`
     * Save and exit pressing CTRL+X and then type Y and then press Enter
-* `ssh-keygen -A` and `then ssh-keygen`
+* `ssh-keygen -A` and then `ssh-keygen`
+* Set user passwort with `passwd` (minimal length is 1 character)
 * `/usr/sbin/sshd` to start the SSH server (if you get *Missing privilege seperation directory: /run/sshd* just create that directory with `mkdir /run/sshd` and run the command again)
-* `ip a` or `hostname -I` to know your local IP address
+* `ip a` or `hostname -I` or `ifconfig` to know your local IP address
 * Now you are able to connect to the phone from another device with the following command: `ssh root@<PHONE_IP_ADDRESS> -p 2222`
+
