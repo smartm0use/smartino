@@ -12,7 +12,7 @@ Some enhancements:
 - Added a more reliable probing strategy for detecting external drive
 - *Added the ability of connecting external drive having already blockchain data (".bitcoin" folder)
 - Harden the externalization of Bitcoin Core configuration file
-- Updated Bitcoin Core version to 24.0
+- Updated Bitcoin Core version
 - Added a couple of shortcut commands
 - Fixed some typos in comments and messages
 - Some other small improvements

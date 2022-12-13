@@ -49,7 +49,7 @@
 REPO_URL="https://github.com/bitcoin/bitcoin.git"
 
 # See https://github.com/bitcoin/bitcoin/tags for latest version.
-VERSION=24.0
+VERSION=24.0.1
 
 TARGET_DIR=$HOME/bitcoin-core
 PORT=8333
@@ -625,7 +625,6 @@ check_bitcoin_core() {
     if [ -f $TARGET_DIR/.bitcoin/bitcoind.pid ]; then
         if [ -f $TARGET_DIR/bin/bitcoin-cli ]; then
             print_info "\nChecking Bitcoin Core..."
-            sleep 5
             $TARGET_DIR/bin/get-net-info.sh
         fi
 
@@ -633,7 +632,7 @@ check_bitcoin_core() {
         if [ $reachable -eq 200 ]; then
             print_success "Bitcoin Core is accepting incoming connections at port $PORT!"
         else
-            print_warning "Bitcoin Core is not accepting incoming connections at port $PORT. You may need to configure port forwarding (https://bitcoin.org/en/full-node#port-forwarding) on your router."
+            print_warning "Bitcoin Core is NOT accepting incoming connections at port $PORT. You may need to configure port forwarding (https://bitcoin.org/en/full-node#port-forwarding) on your router."
         fi
     fi
 }
@@ -687,25 +686,21 @@ probe_external_usb() {
 }
 
 move_to_external() {
+    mv $HOME/bitcoin-core/.bitcoin/bitcoin.conf ..
+
     if [ -d "$EXTERNAL_FOLDER/.bitcoin" ]
     then
         print_info "\nBlockchain data found. Continuing from last block..."
 
-        if [ -f "$EXTERNAL_FOLDER/.bitcoin/bitcoin.conf" ]
-        then
-            cp $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf_bkp
-            mv $HOME/bitcoin-core/.bitcoin/bitcoin.conf $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf
-            print_info "\n\"bitcoin.conf\" file found. It has been overwritten and a backup copy has been saved on the external drive (\"bitcoin.conf_bkp\")."
-        fi
-
-        rm -rf $HOME/bitcoin-core/.bitcoin
+        rm -rf $HOME/bitcoin-core/.bitcoin/*
     else
         mv $HOME/bitcoin-core/.bitcoin $EXTERNAL_FOLDER/
-        rm $EXTERNAL_FOLDER/usb-hook
     fi
 
-    sed -i "s+datadir=$TARGET_DIR/.bitcoin+datadir=$EXTERNAL_FOLDER/.bitcoin+g" $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf
-    sed -i "s+rpccookiefile=$TARGET_DIR/.bitcoin+rpccookiefile=$EXTERNAL_FOLDER/.bitcoin+g" $EXTERNAL_FOLDER/.bitcoin/bitcoin.conf
+    mv $HOME/bitcoin-core/bitcoin.conf $HOME/bitcoin-core/.bitcoin/
+
+    sed -i "s+datadir=$TARGET_DIR/.bitcoin+datadir=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/.bitcoin/bitcoin.conf
+    sed -i "s+rpccookiefile=$TARGET_DIR/.bitcoin+rpccookiefile=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/.bitcoin/bitcoin.conf
 }
 
 create_commands() {
