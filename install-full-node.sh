@@ -54,6 +54,8 @@ VERSION=24.0.1
 TARGET_DIR=$HOME/bitcoin-core
 PORT=8333
 
+EXTERNAL_FOLDER="/external-storage"
+
 BUILD=0
 UNINSTALL=0
 
@@ -439,7 +441,7 @@ download_bin() {
             mkdir -p bitcoin-$VERSION &&
             tar xzf bitcoin-$VERSION.tar.gz -C bitcoin-$VERSION --strip-components=1
     elif program_exists "curl"; then
-        curl --progress-bar "$1" -o bitcoin-$VERSION.tar.gz &&
+        curl -s "$1" -o bitcoin-$VERSION.tar.gz &&
             curl -s "$checksum_url" -o checksum.asc &&
             mkdir -p bitcoin-$VERSION &&
             tar xzf bitcoin-$VERSION.tar.gz -C bitcoin-$VERSION --strip-components=1
@@ -594,7 +596,7 @@ start_bitcoin_core_external() {
         if [ -f $EXTERNAL_FOLDER/.bitcoin/bitcoind.pid ]; then
             print_success "Bitcoin Core is running!"
         else
-            print_error "Failed to start Bitcoin Core: could not create current running instance file (bitcoind.pid) on external folder."
+            print_error "Failed to start Bitcoin Core: could not create current running instance file (bitcoind.pid) on external storage."
             exit 1
         fi
     fi
@@ -625,6 +627,7 @@ check_bitcoin_core() {
     if [ -f $TARGET_DIR/.bitcoin/bitcoind.pid ]; then
         if [ -f $TARGET_DIR/bin/bitcoin-cli ]; then
             print_info "\nChecking Bitcoin Core..."
+            sleep 5
             $TARGET_DIR/bin/get-net-info.sh
         fi
 
@@ -666,25 +669,6 @@ uninstall_bitcoin_core() {
     fi
 }
 
-probe_external_usb() {
-    EXTERNAL_FOLDER=$(mount | grep /mnt/media_rw | cut -d ' ' -f 3);
-    if [ -z "$EXTERNAL_FOLDER" ]
-    then
-        print_warning "\nThe external USB drive is not where it was intended to be."
-        print_info "\nSeeking for external USB drive on the whole system. Be sure to have a file named \"usb-hook\" in your drive. Operation can take few minutes..."
-        EXTERNAL_FOLDER=$(find / -type f -name "usb-hook" 2>/dev/null  | sed 's@/usb-hook@@g')
-        if [ -z "$EXTERNAL_FOLDER" ]
-        then
-            print_error "\nCan't find external USB drive."
-            exit 1
-        else
-            print_info "\nExternal USB drive found: $EXTERNAL_FOLDER"
-        fi
-    else
-        print_info "\nExternal USB drive found: $EXTERNAL_FOLDER"
-    fi
-}
-
 move_to_external() {
     mv $HOME/bitcoin-core/.bitcoin/bitcoin.conf ..
 
@@ -699,18 +683,11 @@ move_to_external() {
 
     mv $HOME/bitcoin-core/bitcoin.conf $HOME/bitcoin-core/.bitcoin/
 
-    sed -i "s+datadir=$TARGET_DIR/.bitcoin+datadir=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/.bitcoin/bitcoin.conf
-    sed -i "s+rpccookiefile=$TARGET_DIR/.bitcoin+rpccookiefile=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/.bitcoin/bitcoin.conf
+    sed -i "s+datadir=$TARGET_DIR/.bitcoin+datadir=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/.bitcoin/bitcoin.conf
+    sed -i "s+rpccookiefile=$TARGET_DIR/.bitcoin+rpccookiefile=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/.bitcoin/bitcoin.conf
 }
 
-create_commands() {
-    cp $HOME/bitcoin-core/bin/start.sh $HOME/bitcoin-core/bin/start.sh_bkp
-    cp $HOME/bitcoin-core/bin/stop.sh $HOME/bitcoin-core/bin/stop.sh_bkp
-
-    sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/start.sh
-    sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/stop.sh
-    sed -i "s+/root/bitcoin-core/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/get-net-info.sh
-
+create_more_commands() {
     cat > $HOME/bitcoin-core/bin/debug.sh <<EOF
 #!/bin/sh
 tail -f $EXTERNAL_FOLDER/.bitcoin/debug.log
@@ -720,7 +697,7 @@ EOF
 
     cat > $HOME/bitcoin-core/bin/get-bc-info.sh <<EOF
 #!/bin/sh
-$HOME/bitcoin-core/bin/bitcoin-cli -conf=$EXTERNAL_FOLDER/.bitcoin/bitcoin.conf getblockchaininfo
+$HOME/bitcoin-core/bin/bitcoin-cli -conf=$HOME/bitcoin-core/.bitcoin/bitcoin.conf getblockchaininfo
 EOF
 
     chmod ugo+x $HOME/bitcoin-core/bin/get-bc-info.sh
@@ -798,7 +775,13 @@ if [ $UNINSTALL -eq 1 ]; then
     fi
 else
     echo "$WELCOME_TEXT"
-    probe_external_usb
+
+    if [ -z "$EXTERNAL_FOLDER" ]
+    then
+        print_error "\nCan't find external drive."
+        exit 1
+    fi
+
     if [ -t 0 ]; then
         # Prompt for confirmation when invoked in tty.
         echo
@@ -831,7 +814,7 @@ else
         echo "Customizing Bitcoin Core for Android with External Drive in 5 seconds..."
         sleep 5
         move_to_external
-        create_commands
+        create_more_commands
         start_bitcoin_core_external
         cat $TARGET_DIR/README.md
         print_success "\nIf this is your first install, Bitcoin Core may take several hours/days to download a full copy of the blockchain."

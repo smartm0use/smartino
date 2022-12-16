@@ -59,7 +59,6 @@ if [ ! -f "${cur}/${folder}/proc/fakethings/stat" ]; then
 	EOF
 fi
 
-
 if [ ! -f "${cur}/${folder}/proc/fakethings/version" ]; then
 	cat <<- EOF > "${cur}/${folder}/proc/fakethings/version"
 	Linux version 5.4.0-faked (andronix@fakeandroid) (gcc version 4.9.x (Andronix fake /proc/version) ) #1 SMP PREEMPT Sun Sep 13 00:00:00 IST 2020
@@ -174,8 +173,31 @@ if [ ! -f "${cur}/${folder}/proc/fakethings/vmstat" ]; then
 	EOF
 fi
 
+echo "Seeking for external storage (SD cards or USB hard drives)..."
+EXTERNAL_FOLDER=$(find /storage -type d -maxdepth 1 | grep -E "/storage/[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$")
+if [ -z "$EXTERNAL_FOLDER" ]
+then
+	  EXTERNAL_FOLDER=$(mount | grep /mnt/media_rw | cut -d ' ' -f 3)
+fi
+
+if [ -z "$EXTERNAL_FOLDER" ]
+then
+    echo "The external drive is not where it was intended to be."
+    echo "Seeking for external drive on the whole system. Be sure to have a file named \"external-hook\" in your drive. Operation can take few minutes..."
+    EXTERNAL_FOLDER=$(find / -type f -name "external-hook" 2>/dev/null | sed 's@/external-hook@@g')
+fi
+
+if [ -z "$EXTERNAL_FOLDER" ]
+then
+    echo "Can't find external drive."
+    exit 1
+else
+    echo "External drive found: $EXTERNAL_FOLDER"
+fi
+sleep 5
+
 bin=start-ubuntu20.sh
-echo "writing launch script"
+echo "Writing launch script"
 cat > $bin <<- EOM
 #!/bin/bash
 cd \$(dirname \$0)
@@ -206,7 +228,7 @@ command+=" -b ${cur}/${folder}/proc/fakethings/vmstat:/proc/vmstat"
 command+=" -b ${cur}/${folder}/proc/fakethings/version:/proc/version"
 ## uncomment the following line to have access to the home directory of termux
 #command+=" -b /data/data/com.termux/files/home:/root"
-command+=" -b /sdcard -b /storage -b $(mount | grep /mnt/media_rw | cut -d ' ' -f 3)"
+command+=" -b ${EXTERNAL_FOLDER}:/external-storage"
 command+=" -w /root"
 command+=" /usr/bin/env -i"
 command+=" MOZ_FAKE_NO_SANDBOX=1"
@@ -251,4 +273,4 @@ echo "removing image for some space"
 rm $tarball
 clear
 echo "You can now launch Ubuntu with the ./${bin} script form next time"
-bash $bin || pkg install tsu && sudo bash $bin
+sudo bash $bin
