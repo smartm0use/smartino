@@ -685,6 +685,7 @@ move_to_external() {
 
     sed -i "s+datadir=$TARGET_DIR/.bitcoin+datadir=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/.bitcoin/bitcoin.conf
     sed -i "s+rpccookiefile=$TARGET_DIR/.bitcoin+rpccookiefile=$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/.bitcoin/bitcoin.conf
+    sed -i "s+$TARGET_DIR/.bitcoin+$EXTERNAL_FOLDER/.bitcoin+g" $HOME/bitcoin-core/bin/stop.sh
 }
 
 create_more_commands() {

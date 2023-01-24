@@ -41,7 +41,7 @@ If this trade-off is ok for you then you can go for original guide and waive the
 * Install the latest version of [Termux](https://f-droid.org/en/packages/com.termux)
 * Run the following command (it will basically install Ubuntu on your phone), answer "y" to all questions and allow Termux to have access to the storage:
 ```
-pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/AndronixApp/AndronixOrigin/master/repo-fix.sh > repo.sh && chmod +x repo.sh && bash repo.sh && pkg update -y && pkg install wget proot tar tsu -y && wget https://raw.githubusercontent.com/smartm0use/smartino/main/install-ubuntu20.sh -O install-ubuntu20.sh && chmod +x install-ubuntu20.sh && bash install-ubuntu20.sh
+pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/AndronixApp/AndronixOrigin/master/repo-fix.sh > repo.sh && chmod +x repo.sh && bash repo.sh && pkg update -y && pkg install wget proot tar tsu mount-utils -y && wget https://raw.githubusercontent.com/smartm0use/smartino/main/install-ubuntu20.sh -O install-ubuntu20.sh && chmod +x install-ubuntu20.sh && bash install-ubuntu20.sh
 ```
 * Be sure you got no errors in mounting external drive, then run the following command from Ubuntu shell (it will install Bitcoin Core and it will set the `datadir` to the external drive):
 ```
@@ -57,10 +57,10 @@ To have remote access to your phone you can follow [SSH Basics](https://docs.and
 * `nano /etc/ssh/sshd_config` and make the following changes:
     * Find and change the line `#Port 22` to `Port 2222`
     * Find the line `#PermitRootLogin prohibit-password` or `#PermitRootLogin yes` and change it to `PermitRootLogin yes`
-    * Save and exit pressing CTRL+X and then type Y and then press Enter
+    * Save and exit pressing CTRL+X and then type Y and press Enter to confirm
 * `ssh-keygen -A` and then `ssh-keygen`
 * Set user password with `passwd` (minimal length is 1 character)
 * `/usr/sbin/sshd` to start the SSH server (if you get *Missing privilege seperation directory: /run/sshd* just create that directory with `mkdir /run/sshd` and run the command again)
-* `ip a` or `hostname -I` or `ifconfig` to know your local IP address
+* `hostname -I` or `ip a` or `ifconfig` to know your local IP address
 * Now you are able to connect to the phone from another device with the following command: `ssh root@<PHONE_IP_ADDRESS> -p 2222`
 
