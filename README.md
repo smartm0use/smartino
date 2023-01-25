@@ -2,6 +2,8 @@
 
 Bash scripts for installing Bitcoin Core on Android and run a full node on a phone!  
 
+![Image](meme.png "Smartino Meme")
+
 That's possible because:
 * you can run Ubuntu (or other distro) in your Android phone thanks to [Andronix](https://andronix.app)
 * you can attach an external drive to the phone using a USB hub or insert an high capacity MicroSD card
