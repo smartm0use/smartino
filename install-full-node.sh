@@ -172,6 +172,12 @@ Command to view blockchain information:
     or
     get-bc-info
 
+Command to view connected nodes:
+
+    $HOME/bitcoin-core/bin/get-peer-info.sh
+    or
+    get-peer-info
+
 EOF
 }
 
@@ -703,11 +709,19 @@ EOF
 
     chmod ugo+x $HOME/bitcoin-core/bin/get-bc-info.sh
 
+    cat > $HOME/bitcoin-core/bin/get-peer-info.sh <<EOF
+#!/bin/sh
+$HOME/bitcoin-core/bin/bitcoin-cli -conf=$HOME/bitcoin-core/.bitcoin/bitcoin.conf getpeerinfo
+EOF
+
+    chmod ugo+x $HOME/bitcoin-core/bin/get-peer-info.sh
+
     cp $HOME/bitcoin-core/bin/start.sh /usr/local/bin/start-btc
     cp $HOME/bitcoin-core/bin/stop.sh /usr/local/bin/stop-btc
     cp $HOME/bitcoin-core/bin/debug.sh /usr/local/bin/debug-btc
     cp $HOME/bitcoin-core/bin/get-net-info.sh /usr/local/bin/get-net-info
     cp $HOME/bitcoin-core/bin/get-bc-info.sh /usr/local/bin/get-bc-info
+    cp $HOME/bitcoin-core/bin/get-peer-info.sh /usr/local/bin/get-peer-info
 }
 
 

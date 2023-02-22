@@ -47,7 +47,7 @@ pkg upgrade && termux-setup-storage && curl https://raw.githubusercontent.com/An
 ```
 * Be sure you got no errors in mounting external drive, then run the following command from Ubuntu shell (it will install Bitcoin Core and it will set the `datadir` to the external drive):
 ```
-apt-get update && apt-get upgrade -y && apt install curl -y && curl https://raw.githubusercontent.com/smartm0use/smartino/main/install-full-node.sh | sh
+apt update && apt upgrade -y && apt install curl -y && curl https://raw.githubusercontent.com/smartm0use/smartino/main/install-full-node.sh | sh
 ```
 * For incoming connections to your node be sure you've configured your router for [port forwarding](https://bitcoin.org/en/full-node#port-forwarding) (port 8333) and optionally to change your [firewall settings](https://bitcoin.org/en/full-node#firewall-configuration)
 * Once your node is fully synced with the blockchain visit [Bitnodes](https://bitnodes.io/#join-the-network) to check connection
@@ -56,7 +56,7 @@ apt-get update && apt-get upgrade -y && apt install curl -y && curl https://raw.
 
 ## Remote access using SSH
 If you find awkward tapping on a small screen, you may consider to get remote access to your phone following [SSH Basics](https://docs.andronix.app/ssh/ssh-basics) by Andronix or these steps:
-* `apt-get update`
+* `apt update`
 * `apt install openssh-server nano`
 * `nano /etc/ssh/sshd_config` and make the following changes:
     * Find and change the line `#Port 22` to `Port 2222`
@@ -71,7 +71,7 @@ If you find awkward tapping on a small screen, you may consider to get remote ac
 ## Running node under Tor
 Since you are using a mobile device you may use a SIM or an eSIM with a mobile data plan. In this case port forwarding to enable incoming connections to your node could not work due mobile operator limitations. Using Tor is the solution.
 * If it is running stop Bitcoin Core (`stop-btc` command)
-* If you didn't do it for a while run `apt-get update`
+* If you didn't do it for a while run `apt update`
 * Install tor running `apt install tor`
 * Figure out where your torrc file is (`/etc/tor/torrc` is one possibility) and uncomment/add the following lines:
 ```
@@ -84,9 +84,9 @@ CookieAuthFileGroupReadable 1
 * Start Bitcoin Core (with `start-btc` command) and then run `debug-btc` to take note of the Onion address that is advertised. You can check for reachability on [BitNodes.io](https://bitnodes.io)
 
 ## Running Electrum Server
-You may consider to make your node reachable by Electrum wallets. Since tens of GB are required to store electrs data, it is safe to have it on the same external drive, instead of phone local storage. You can install and run "electrs" following these steps:
-* If you didn't do it for a while run `apt-get update`
-* Install some dependencies with `apt-get install cargo clang cmake git curl`
+You may consider to make your node reachable by Electrum wallets. With [electrs](https://github.com/romanz/electrs), a reimplementation of Electrum Server, you can make it happen. Since tens of GB are required to store electrs data, it is safe to have it on the same external drive, instead of phone local storage. You can install and run electrs following these steps:
+* If you didn't do it for a while run `apt update`
+* Install some dependencies with `apt install cargo clang cmake git curl`
 * Get the latest version with `git clone https://github.com/romanz/electrs.git`
 * Enter `electrs` folder and compile from source with `cargo build --locked --release` (it will take few minutes)
 * Create the folder ".electrs" on your external drive, enter into it and type `nano electrs.conf`. Paste the following settings:
