@@ -82,36 +82,3 @@ CookieAuthFileGroupReadable 1
 * For further settings (i.e. anonymity) and more information about using Bitcoin Core with Tor you can follow the guide [Setting up a Tor hidden service](https://en.bitcoin.it/wiki/Setting_up_a_Tor_hidden_service) on Bitcoin Wiki
 * Launch Tor with `/etc/init.d/tor start` (you can check if it is running with `/etc/init.d/tor status`)
 * Start Bitcoin Core (with `start-btc` command) and then run `debug-btc` to take note of the Onion address that is advertised. You can check for reachability on [BitNodes.io](https://bitnodes.io)
-
-## Running Electrum Server
-You may consider to make your node reachable by Electrum wallets. With [electrs](https://github.com/romanz/electrs), a reimplementation of Electrum Server, you can make it happen. Since tens of GB are required to store electrs data, it is safe to have it on the same external drive, instead of phone local storage. You can install and run electrs following these steps:
-* If you didn't do it for a while run `apt update`
-* Install some dependencies with `apt install cargo clang cmake git curl`
-* Get the latest version with `git clone https://github.com/romanz/electrs.git`
-* Enter `electrs` folder and compile from source with `cargo build --locked --release` (it will take few minutes)
-* Create the folder ".electrs" on your external drive, enter into it and type `nano electrs.conf`. Paste the following settings:
-```
-network = "bitcoin"
-daemon_dir= "/external-storage/.bitcoin"
-daemon_rpc_addr = "127.0.0.1:8332"
-daemon_p2p_addr = "127.0.0.1:8333"
-
-electrum_rpc_addr = "127.0.0.1:50001"
-db_dir = "/external-storage/.electrs/db"
-index_lookup_limit = 1000
-
-log_filters = "INFO"
-timestamp = true
-```
-* Going back to your home and run electrs with `electrs/target/release/electrs --conf /external-storage/.electrs/electrs.conf`. Please be aware that to run electrs without errors you need first to have Bitcoin Core running and 100% synched. Besides, electrs needs to index blocks and compacting its database before it could became reachable, so <u>the process could take several hours</u>.
-* Now you can connect Electrum wallets to your node running the following command: `electrum -1 -s <YOUR_NODE_IP_ADDRESS>:50001:t`
-* In case of use of Tor you have to take a couple more steps:
-    * Open `/etc/tor/torrc` file and add the following lines:
-    ``` 
-    HiddenServiceDir /var/lib/tor/electrs_hidden_service/
-    HiddenServiceVersion 3
-    HiddenServicePort 50001 127.0.0.1:50001
-    ```
-    * Restart Tor and open `/var/lib/tor/electrs_hidden_service/hostname` to get the newly created Onion address
-    * Use that address to run Electrum: `electrum -1 -s <YOUR_NODE_ONION_ADDRESS>:50001:t -p socks5:localhost:9050`
-
