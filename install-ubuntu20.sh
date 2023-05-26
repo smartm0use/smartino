@@ -174,10 +174,19 @@ if [ ! -f "${cur}/${folder}/proc/fakethings/vmstat" ]; then
 fi
 
 echo "Seeking for external storage (SD cards or USB hard drives)..."
-EXTERNAL_FOLDER=$(find /storage -type d -maxdepth 1 | grep -E "/storage/[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$")
+EXTERNAL_FOLDER=$(find /storage -maxdepth 1 -type d | grep -E "/storage/[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$")
+SEARCH_METHOD="UUID mechanism"
+
 if [ -z "$EXTERNAL_FOLDER" ]
 then
-	  EXTERNAL_FOLDER=$(mount | grep /mnt/media_rw | cut -d ' ' -f 3)
+  EXTERNAL_FOLDER=$(find /storage -maxdepth 1 -type d | grep -E "/storage/[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$")
+  SEARCH_METHOD="Shorter UID (for FAT, exFAT and NTFS filesystems that do not support UUID)"
+fi
+
+if [ -z "$EXTERNAL_FOLDER" ]
+then
+  EXTERNAL_FOLDER=$(mount | grep /mnt/media_rw | cut -d ' ' -f 3)
+  SEARCH_METHOD="Mounting point path"
 fi
 
 if [ -z "$EXTERNAL_FOLDER" ]
@@ -185,6 +194,7 @@ then
     echo "The external drive is not where it was intended to be."
     echo "Seeking for external drive on the whole system. Be sure to have a file named \"external-hook\" in your drive. Operation can take few minutes..."
     EXTERNAL_FOLDER=$(find / -type f -name "external-hook" 2>/dev/null | sed 's@/external-hook@@g')
+    SEARCH_METHOD="Searching for \"external-hook\" file in whole system"
 fi
 
 if [ -z "$EXTERNAL_FOLDER" ]
@@ -192,7 +202,8 @@ then
     echo "Can't find external drive."
     exit 1
 else
-    echo "External drive found: $EXTERNAL_FOLDER"
+    echo "External drive searching method: $SEARCH_METHOD"
+    echo "External drive path: $EXTERNAL_FOLDER"
 fi
 sleep 5
 
