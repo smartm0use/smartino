@@ -31,7 +31,10 @@ Here are some enhancements:
 * Android phone with OTG support or high capacity MicroSD support
 * **Root privileges**
 * 1 TB external storage (no more than one connected to the phone)
-* One or more USB adapters in case you need power both for phone and for external drive
+* USB hub to connect both phone charger and external drive to the phone
+
+<p style="background-color: lightyellow;">WARNING: The use of low-quality chargers/USB cables, or with specifications that differ from those indicated by the manufacturer, may damage the phone's battery.<br />
+Ensure that the phone indicates that the battery is charging when the charger is connected via the USB hub; otherwise, it is advisable to change the hub. If the battery icon does not show charging status, the recharging process may still occur, but there is a risk of damaging the battery to the point of causing it to swell!</p>
 
 ## Root privileges
 If you are not able or do not want to root your phone you can use the original guide that works - according to what the author says - only with some Samsung models having [DeX](https://en.wikipedia.org/wiki/Samsung_DeX) support.
